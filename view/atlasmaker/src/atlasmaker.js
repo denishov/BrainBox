@@ -1,10 +1,9 @@
 /* eslint-disable max-lines */
 /*! AtlasMaker */
+/* eslint-disable max-lines */
 
 import 'structjs';
 import './css/atlasmaker.css';
-
-import $ from 'jquery';
 
 import {AtlasMakerDraw} from './atlasmaker-draw.js';
 import {AtlasMakerIO} from './atlasmaker-io.js';
@@ -14,10 +13,6 @@ import {AtlasMakerUI} from './atlasmaker-ui.js';
 import {AtlasMakerWS} from './atlasmaker-ws.js';
 
 import Config from './../../../cfg.json';
-import toolsFull from './html/toolsFull.html';
-import toolsLight from './html/toolsLight.html';
-
-window.$ = $;
 
 /**
  * AtlasMakerWidget base object
@@ -137,12 +132,16 @@ const me = {
   msg0: '', // ?
   prevData: 0, // ?
 
+  // messaging and logged info
+  receivedMessages: [],
+  notificationMessage: '',
+
   /**
    * Closes the websocket before leaving
    * @function quit
    * @return {void}
    */
-  quit: function () {
+  quit() {
     me.log('', 'Goodbye!');
     me.socket.close();
     me.socket = null;
@@ -156,7 +155,7 @@ const me = {
    *        If undefined, the script will be loaded.
    * @returns {object} A promise
    */
-  loadScript: function (path, testScriptPresent) {
+  loadScript(path, testScriptPresent) {
     const pr = new Promise((resolve, reject) => {
       if(testScriptPresent && testScriptPresent()) {
         console.log('[loadScript] Script', path, 'already present, not loading it again');
@@ -177,43 +176,42 @@ const me = {
 
     return pr;
   },
-  _removeVariablesFromURL: function (url) {
+  _removeVariablesFromURL(url) {
     return url.split('&')[0];
   },
-  _registerToolDown: function(tool) {
+  _registerToolDown(tool) {
     const {name, func} = tool;
     me.clickDownTools[name] = func;
   },
-  _registerToolMove: function(tool) {
+  _registerToolMove(tool) {
     const {name, func} = tool;
     me.moveTools[name] = func;
   },
-  _registerToolUp: function(tool) {
+  _registerToolUp(tool) {
     const {name, func} = tool;
     me.clickUpTools[name] = func;
   },
-  _registerToolLongPress: function(tool) {
+  _registerToolLongPress(tool) {
     const {name, func} = tool;
     me.longPressTools[name] = func;
   },
-  _registerToolDisplayInformation: function (func) {
+  _registerToolDisplayInformation(func) {
     me.displayInformationFunctions.push(func);
   },
-  _registerAllToolsDown: function () {
+  _registerAllToolsDown() {
     const arr = [
       {name: 'show', func: me._showToolDown},
       {name: 'paint', func: me._paintToolDown},
       {name: 'erase', func: me._eraseToolDown},
       {name: 'measure', func: me._measureToolDownHandler},
       {name: 'landmark', func: me._landmarkToolDown},
-      {name: 'adjust', func: me._adjustToolDown},
       {name: 'eyedrop', func: me._eyedropToolDown}
     ];
     for(const tool of arr) {
       me._registerToolDown(tool);
     }
   },
-  _registerAllToolsMove: function () {
+  _registerAllToolsMove() {
     const arr = [
       {name: 'landmark', func: me._landmarkToolMove},
       {name: 'paint', func: me._paintToolMove},
@@ -224,7 +222,7 @@ const me = {
       me._registerToolMove(tool);
     }
   },
-  _registerAllToolsUp: function () {
+  _registerAllToolsUp() {
     const arr = [
       {name: 'show', func: me._showToolUp},
       {name: 'eyedrop', func: me._eyedropToolUp},
@@ -236,25 +234,25 @@ const me = {
       me._registerToolUp(tool);
     }
   },
-  _registerAllToolsLongPress: function () {
+  _registerAllToolsLongPress() {
     const arr = [{name: 'landmark', func: me._landmarkToolLong}];
     for(const tool of arr) {
       me._registerToolLongPress(tool);
     }
   },
-  _registerAllToolsDisplayInformation: function () {
+  _registerAllToolsDisplayInformation() {
     me._registerToolDisplayInformation(me.landmarkToolDisplayInformation);
     me._registerToolDisplayInformation(me.measureToolDisplayInformation);
   },
-  _addAtlasMakerComponents: function () {
-    $.extend(me, AtlasMakerDraw);
-    $.extend(me, AtlasMakerInteraction);
-    $.extend(me, AtlasMakerIO);
-    $.extend(me, AtlasMakerPaint);
-    $.extend(me, AtlasMakerUI);
-    $.extend(me, AtlasMakerWS);
+  _addAtlasMakerComponents() {
+    Object.assign(me, AtlasMakerDraw);
+    Object.assign(me, AtlasMakerInteraction);
+    Object.assign(me, AtlasMakerIO);
+    Object.assign(me, AtlasMakerPaint);
+    Object.assign(me, AtlasMakerUI);
+    Object.assign(me, AtlasMakerWS);
   },
-  _createOffscreenCanvases: function () {
+  _createOffscreenCanvases() {
     // Create offscreen canvases for mri and atlas
     me.brainOffcn = document.createElement('canvas');
     me.brainOfftx = me.brainOffcn.getContext('2d');
@@ -297,13 +295,13 @@ const me = {
     // Add precise cursor
     const isTouchArr = [];//["iPad","iPod"];
     const [, curDevice] = navigator.userAgent.split(/[(;]/);
-    if($.inArray(curDevice, isTouchArr)>=0) {
+    if(isTouchArr.includes(curDevice)) {
       me.flagUsePreciseCursor=true;
       me.initCursor();
     }
 
     // get pointer to progress div
-    me.progress=$('a.download_MRI');
+    me.progress=document.querySelector('a.download_MRI');
   },
 
   //====================================================================================
@@ -316,99 +314,16 @@ const me = {
      * @param {object} elem DOM element
      * @return {object} Returns a promise
      */
-  // eslint-disable-next-line max-statements
-  initAtlasMaker: function (elem) {
+  async initAtlasMaker(elem) {
     me._addAtlasMakerComponents();
-
-    // check if user is loged in
-    $.get('/loggedIn', function(res) {
-      if(res.loggedIn) {
-        me.User.username=res.username;
-      } else {
-        me.User.username='Anonymous';
-      }
-    });
+    me.identifyUser();
 
     me._createOffscreenCanvases();
     me._createOnscreenCanvases(elem);
 
-    // event connect: Configure mouse events for desktop computers
-    // (touch events are configured in the initCursor function)
-    me.canvas.onmousedown = me.mousedown;
-    me.canvas.onmousemove = me.mousemove;
-    me.canvas.onmouseup = me.mouseup;
-
-
-    // text input
-    Promise.all([
-      me.loadScript('https://unpkg.com/codeflask/build/codeflask.min.js'),
-      me.loadScript('https://cdn.jsdelivr.net/gh/r03ert0/consolita.js@v0.1.1/consolita.js')
-    ]).then(() => {
-      window.onload = () => {
-        // eslint-disable-next-line no-undef
-        Consolita.init('#logScript');
-      };
-    });
-
-    // long-press event
-    me.loadScript('https://cdn.jsdelivr.net/gh/john-doherty/long-press-event@2.1.0/dist/long-press-event.min.js')
-      .then(() => {
-        me.container.addEventListener('long-press', me.longpress);
-      });
-
-    // event connect: Connect event to respond to window resizing
-    $(window).resize(function() {
-      me.resizeWindow();
-      me.drawImages();
-    });
-
-    // Init the toolbar
-
-    // configure and append tools
-    let tools;
-    if(typeof me.useFullTools === 'undefined') {
-      me.useFullTools = true;
-    }
-    if(me.useFullTools) {
-      tools = toolsFull;
-    } else {
-      tools = toolsLight;
-    }
-    me.container.insertAdjacentHTML('beforeend', tools);
-
-    // event connect: get keyboard events
-    $(document).keydown(function(e) { me.keyDown(e); });
-
-    // event connect: configure annotation tools
-    $('#tools-minimized').click(function() { me.changeToolbarDisplay('maximize'); });
-    me.push($('.push#display-minimize'), function() { me.changeToolbarDisplay('minimize'); });
-    me.push($('.push#display-left'), function() { me.changeToolbarDisplay('left'); });
-    me.push($('.push#display-right'), function() { me.changeToolbarDisplay('right'); });
-    me.slider($('.slider#slice'), function(x) { me.changeSlice(Math.round(x)); });
-    me.chose($('.chose#plane'), me.changeView);
-    me.chose($('.chose#paintTool'), me.changeTool);
-    me.chose($('.chose#penSize'), me.changePenSize);
-    me.toggle($('.toggle#precise'), me.togglePreciseCursor);
-    me.toggle($('.toggle#fill'), me.toggleFill);
-    me.toggle($('.toggle#fullscreen'), me.toggleFullscreen);
-    me.chose3state($('.chose#text'), me.toggleTextInput);
-    me.push($('.push#3drender'), me.render3D);
-    me.push($('.push#link'), me.link);
-    me.push($('.push#upload'), me.upload);
-    me.push($('.push#download'), me.download);
-    me.push($('.push#color'), me.color);
-    me.push($('.push#undo'), me.sendUndoMessage);
-    me.push($('.push#save'), me.sendSaveMessage);
-    me.push($('.push#prev'), me.prevSlice);
-    me.push($('.push#next'), me.nextSlice);
-
-    // event connect: chat message input
-    $('#msg').keypress((e) => { me.onkey(e); });
-
-    $('#tools-minimized').hide();
-
-    // load tools
     me.loadTools();
+
+    me.setupEventListeners();
 
     // event connect: register click tools
     me._registerAllToolsDown();
@@ -419,24 +334,45 @@ const me = {
     // register functions displaying information
     me._registerAllToolsDisplayInformation();
 
-    // start websocket
-    // try {
-    //   await me.initSocketConnection();
-    // } catch(err) {
-    //   throw new Error(err);
-    // }
-    const pr = new Promise(function(resolve, reject) {
-      me.initSocketConnection()
-        .then( () => {
-          resolve();
-        })
-        .catch( (err) => {
-          console.error('ERROR:', err);
-          reject(err);
-        });
+    try {
+      await me.initSocketConnection();
+    } catch(err) {
+      console.error('ERROR:', err);
+      throw err;
+    }
+  },
+
+  async identifyUser() {
+    // check if user is logged in
+    const res = await (await fetch('/loggedIn')).json();
+    if(res.loggedIn) {
+      me.User.username=res.username;
+    } else {
+      me.User.username='Anonymous';
+    }
+  },
+
+  async setupEventListeners() {
+    // event connect: Configure mouse events for desktop computers
+    // (touch events are configured in the initCursor function)
+    me.canvas.onmousedown = me.mousedown;
+    me.canvas.onmousemove = me.mousemove;
+    me.canvas.onmouseup = me.mouseup;
+
+    // event connect: Connect event to respond to window resizing
+    window.addEventListener('resize', () => {
+      me.resizeWindow();
+      me.drawImages();
     });
 
-    return pr;
+    // event connect: get keyboard events
+    document.addEventListener('keydown', (e) => {
+      me.keyDown(e);
+    });
+
+    // long-press event
+    await me.loadScript('https://cdn.jsdelivr.net/gh/john-doherty/long-press-event@2.1.0/dist/long-press-event.min.js');
+    me.container.addEventListener('long-press', me.longpress);
   },
 
   /**
@@ -446,35 +382,56 @@ const me = {
    * @param {string} source The MRI source, a URL
    * @return {object} A promise
    */
-  _requestMRIInfo: function (source) {
+  _requestMRIInfo(source) {
     const url = me._removeVariablesFromURL(source);
-    $('#loadingIndicator p').text('Loading... ');
+    me.setLoadingMessage('Loading... ');
     const pr = new Promise(function(resolve, reject) {
-      const timer = setInterval( function () {
+      const timer = setInterval( async function () {
         console.log('polling for data...', url);
-        $.post(me.hostname + '/mri/json', {url}, function(info) {
-          if(info.success === true) {
-            console.log('requestMRIInfo promise resolved');
-            clearInterval(timer);
-            resolve(info);
-          } else if(info.success === 'downloading') {
-            if(me.User.source !== url) {
-              clearInterval(timer);
-              reject(new Error('source changed. Probably no longer requested?'));
 
-              return;
-            }
-            $('#loadingIndicator p').text('Loading... '+parseInt(info.cur/info.len*100, 10)+'%');
-          } else {
-            console.log('ERROR: requestMRIInfo', info);
-            clearInterval(timer);
-            reject(new Error('requestMRIInfo' + info));
-          }
+        const res = await fetch(me.hostname + '/mri/json', {
+          method: 'POST',
+          headers: {'content-type': 'application/json'},
+          body: JSON.stringify({ url })
         });
+        const info = await res.json();
+        if(info.success === true) {
+          console.log('requestMRIInfo promise resolved');
+          clearInterval(timer);
+          resolve(info);
+        } else if(info.success === 'downloading') {
+          if(me.User.source !== url) {
+            clearInterval(timer);
+            reject(new Error('source changed. Probably no longer requested?'));
+
+            return;
+          }
+          me.setLoadingMessage('Loading... '+parseInt(info.cur/info.len*100, 10)+'%');
+        } else {
+          console.log('ERROR: requestMRIInfo', info);
+          clearInterval(timer);
+          reject(new Error('requestMRIInfo' + info));
+        }
       }, 2000);
     });
 
     return pr;
+  },
+
+  merge(source, target) {
+    for (const [key, val] of Object.entries(source)) {
+      if (val !== null && typeof val === 'object') {
+        if (typeof target[key] === 'undefined') {
+          // eslint-disable-next-line
+          target[key] = new Object.getPrototypeOf(val).constructor();
+        }
+        me.merge(val, target[key]);
+      } else {
+        target[key] = val;
+      }
+    }
+
+    return target;
   },
 
   /**
@@ -487,7 +444,7 @@ const me = {
    * @return {object} A promise
    */
   // eslint-disable-next-line max-statements
-  _configureMRI: async function (info, index) {
+  async _configureMRI(info, index) {
     me.User.source = info.source;
     let info2;
     try {
@@ -502,7 +459,7 @@ const me = {
       // call. Here we merge the fields from info2 that are initialised upon
       // download of the mri server-side. The mri field in the original 'info',
       // which contains the newly created text 'annotations', is conserved
-      $.extend(true, info, info2);
+      info = me.merge(info, info2);
     }
     info2 = info;
 
@@ -553,7 +510,7 @@ const me = {
    * @param {object} json A json object with ontology information
    * @return {void}
    */
-  configureOntology: function (json) {
+  configureOntology(json) {
     me.ontology=json;
     me.ontology.valueToIndex=[];
     me.ontology.labels.forEach(function(o, i) { me.ontology.valueToIndex[o.value]=i; });
@@ -574,12 +531,12 @@ const me = {
     let info2;
     let res;
     let labels;
-
     // configure MRI and ontology
     try {
-      info2 = await me._configureMRI(info, index);
+      info2 = await me._configureMRI(info, index-1); // NB: Cheated and took index minus 1 to start with 0
       info = info2;
-      res = await fetch(me.hostname + '/labels/' + info.mri.atlas[index].labels);
+      const url = me.hostname + '/labels/' + info.mri.atlas[index-1].labels; // NB: Cheated and took index minus 1 to start with 0
+      res = await fetch(url);
       labels = await res.json();
     } catch (err) {
       throw new Error(err);
@@ -595,22 +552,11 @@ const me = {
     // configure vectorial layer
     // [HERE]
 
-    /** @todo better implementation of this hack to enforce fullscreen setting after the server gets me.User settings */
-    setTimeout(() => {
-      console.log('====> Request fullscreen');
-      if(me.fullscreen === true) { // WARNING: HACK... would be better to implement enter/exit fullscreen
-        me.fullscreen=false;
-        me.toggleFullscreen();
-      }
-    }, 500);
-
-    // enforce stereotaxic plane setting
-    if(me.User.view !== null) {
-      $('.chose#plane .a').removeClass('pressed');
-      const view=me.User.view.charAt(0).toUpperCase()+me.User.view.slice(1);
-      $('.chose#plane .a:contains(\''+view+'\')').addClass('pressed');
+    // enforce fullscreen setting
+    if(me.fullscreen === true) { // WARNING: HACK... would be better to implement enter/exit fullscreen
+      //me.fullscreen=false;
+      //me.toggleFullscreen(); // FIXME
     }
-
 
     // pick the first label for segmenting (it has to come after the
     // sendUserDataMessage calls, because it also sends ws messages)
