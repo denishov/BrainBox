@@ -1,4 +1,4 @@
-/* global AtlasMakerWidget $ */
+/* global AtlasMakerWidget */
 /*! AtlasMaker: Interaction */
 
 /* it seems that this file is not used currently */
@@ -13,7 +13,7 @@ export const AtlasMakerInteraction = {
   //========================================================================================
   // Load graphic tools and commands
   //========================================================================================
-  _loadCommandTool: function(tool) {
+  _loadCommandTool: function (tool) {
     const me = AtlasMakerWidget;
     // const path = `/lib/atlasmaker-tools/${tool.name}.js`;
     // const path = `../tools/${tool.name}.js`;
@@ -23,10 +23,10 @@ export const AtlasMakerInteraction = {
 
     return me.loadScript(`/lib/atlasmaker-tools/${tool.name}.js`);
   },
-  _loadTools: function(list) {
+  _loadTools: function (list) {
     const me = AtlasMakerWidget;
-    for(const tool of list) {
-      if(tool.type === 'cmd') {
+    for (const tool of list) {
+      if (tool.type === 'cmd') {
         me._loadCommandTool(tool);
       }
     }
@@ -54,18 +54,18 @@ export const AtlasMakerInteraction = {
      */
   changeView: function (theView) {
     const me = AtlasMakerWidget;
-    switch(theView) {
-    case 'sag':
-      me.User.view = 'sag';
-      break;
-    case 'cor':
-      me.User.view = 'cor';
-      break;
-    case 'axi':
-      me.User.view = 'axi';
-      break;
+    switch (theView) {
+      case 'sag':
+        me.User.view = 'sag';
+        break;
+      case 'cor':
+        me.User.view = 'cor';
+        break;
+      case 'axi':
+        me.User.view = 'axi';
+        break;
     }
-    me.sendUserDataMessage(JSON.stringify({ 'view':me.User.view }));
+    me.sendUserDataMessage(JSON.stringify({ 'view': me.User.view }));
     me.configureBrainImage();
     me.configureAtlasImage();
     me.resizeWindow();
@@ -81,31 +81,31 @@ export const AtlasMakerInteraction = {
      */
   changeTool: function (theTool) {
     const me = AtlasMakerWidget;
-    if(theTool.toLowerCase() === me.User.tool) {
+    if (theTool.toLowerCase() === me.User.tool) {
       return;
     }
 
-    switch(theTool) {
-    case 'Show':
-      me.User.tool = 'show';
-      break;
-    case 'Paint':
-      me.User.tool = 'paint';
-      break;
-    case 'Erase':
-      me.User.tool = 'erase';
-      break;
-    case 'Landmark':
-      me.User.tool = 'landmark';
-      break;
-    case 'Measure':
-      me.User.tool = 'measure';
-      break;
-    case 'Eyedrop':
-      me.User.tool = 'eyedrop';
-      break;
+    switch (theTool) {
+      case 'Show':
+        me.User.tool = 'show';
+        break;
+      case 'Paint':
+        me.User.tool = 'paint';
+        break;
+      case 'Erase':
+        me.User.tool = 'erase';
+        break;
+      case 'Landmark':
+        me.User.tool = 'landmark';
+        break;
+      case 'Measure':
+        me.User.tool = 'measure';
+        break;
+      case 'Eyedrop':
+        me.User.tool = 'eyedrop';
+        break;
     }
-    me.sendUserDataMessage(JSON.stringify({ 'tool':me.User.tool }));
+    me.sendUserDataMessage(JSON.stringify({ 'tool': me.User.tool }));
     me.User.measureLength = null;
   },
 
@@ -117,7 +117,7 @@ export const AtlasMakerInteraction = {
   changePenSize: function (theSize) {
     const me = AtlasMakerWidget;
     me.User.penSize = parseInt(theSize, 10);
-    me.sendUserDataMessage(JSON.stringify({ 'penSize':me.User.penSize }));
+    me.sendUserDataMessage(JSON.stringify({ 'penSize': me.User.penSize }));
   },
 
   /**
@@ -128,7 +128,7 @@ export const AtlasMakerInteraction = {
   changePenColor: function (index) {
     const me = AtlasMakerWidget;
     me.User.penValue = me.ontology.labels[index].value;
-    me.sendUserDataMessage(JSON.stringify({ 'penValue':me.User.penValue }));
+    me.sendUserDataMessage(JSON.stringify({ 'penValue': me.User.penValue }));
   },
 
   /**
@@ -139,7 +139,7 @@ export const AtlasMakerInteraction = {
   changeSlice: function (x) {
     const me = AtlasMakerWidget;
     me.User.slice = x;
-    me.sendUserDataMessage(JSON.stringify({ 'slice':me.User.slice }));
+    me.sendUserDataMessage(JSON.stringify({ 'slice': me.User.slice }));
     me.drawImages();
   },
 
@@ -151,76 +151,7 @@ export const AtlasMakerInteraction = {
   toggleFill: function (doFill) {
     const me = AtlasMakerWidget;
     me.User.doFill = doFill;
-    me.sendUserDataMessage(JSON.stringify({ 'doFill':me.User.doFill }));
-  },
-
-  /**
-     * @function toggleTextInput
-     * @param {string} mode One from Chat or Script
-     * @returns {void}
-     */
-  toggleTextInput: function (mode) {
-    switch(mode) {
-    case 'Chat':
-      $('#textInputBlock').show();
-      document.getElementById('logScript').classList.add('hidden');
-      document.getElementById('logChat').classList.remove('hidden');
-      document.querySelector('#logChat #msg').focus();
-      break;
-    case 'Script':
-      $('#textInputBlock').show();
-      document.getElementById('logScript').classList.remove('hidden');
-      document.getElementById('logChat').classList.add('hidden');
-      document.querySelector('#logScript textarea').focus();
-      break;
-    default:
-      $('#textInputBlock').hide();
-    }
-  },
-
-  /**
-     * @function toggleFullscreen
-     * @returns {void}
-     */
-  // eslint-disable-next-line max-statements
-  toggleFullscreen: function () {
-    const me = AtlasMakerWidget;
-    if(me.fullscreen === false) {
-      // Enter fullscreen
-      //-----------------
-
-      // add black overlay
-      const black = $('<div id = \'blackOverlay\'>');
-      black.css({ position:'fixed', top:0, left:0, width:'100%', height:'100%', 'z-index':5, 'background-color':'#222' });
-      $('body').append(black);
-
-      // configure display mode
-      $('body').addClass('atlasmaker-fullscreen');
-      $('#atlasmaker')
-        .detach()
-        .appendTo('body');
-      me.resizeWindow();
-      me.drawImages();
-
-      // configure toolbar for edit mode
-      me.fullscreen = true;
-    } else {
-
-      // Exit fullscreen
-      //----------------
-
-      // remove black overlay
-      $('#blackOverlay').remove();
-
-      // go back to display mode
-      $('body').removeClass('atlasmaker-fullscreen');
-      $('#atlasmaker')
-        .detach()
-        .appendTo('#stereotaxic');
-      me.resizeWindow();
-      me.drawImages();
-      me.fullscreen = false;
-    }
+    me.sendUserDataMessage(JSON.stringify({ 'doFill': me.User.doFill }));
   },
 
   /**
@@ -232,10 +163,10 @@ export const AtlasMakerInteraction = {
     const me = AtlasMakerWidget;
     let c = [0, 0, 0];
     let i;
-    if(val in me.ontology.valueToIndex) { i = me.ontology.valueToIndex[val]; }
-    if(typeof i !== 'undefined') {
+    if (val in me.ontology.valueToIndex) { i = me.ontology.valueToIndex[val]; }
+    if (typeof i !== 'undefined') {
       c = me.ontology.labels[i].color;
-    } else if(val) {
+    } else if (val) {
       c = [255, 0, 0]; // unavailable labels are set to pure red
     }
 
@@ -243,15 +174,15 @@ export const AtlasMakerInteraction = {
   },
   _voxelCoord2ScreenCoord: function (position) {
     const me = AtlasMakerWidget;
-    const {view} = me.User;
+    const { view } = me.User;
     let x, y;
     let newSlice;
-    const {sdim} = me.User.s2v;
-    if(view === 'sag') {
+    const { sdim } = me.User.s2v;
+    if (view === 'sag') {
       [x, y, newSlice] = [position[1], sdim[2] - 1 - position[2], position[0]];
-    } else if(view === 'cor') {
+    } else if (view === 'cor') {
       [x, y, newSlice] = [position[0], sdim[2] - 1 - position[2], position[1]];
-    } else if (view === 'axi' ) {
+    } else if (view === 'axi') {
       [x, y, newSlice] = [position[0], sdim[1] - 1 - position[1], position[2]];
     }
 
@@ -265,51 +196,61 @@ export const AtlasMakerInteraction = {
   // eslint-disable-next-line max-statements
   initCursor: function () {
     const me = AtlasMakerWidget;
-    const W = parseFloat($('#atlasmaker canvas').css('width'));
-    const H = parseFloat($('#atlasmaker canvas').css('height'));
-    const w = parseFloat($('#atlasmaker canvas').attr('width'));
-    const h = parseFloat($('#atlasmaker canvas').attr('height'));
+    const canvas = document.querySelector('#atlasmaker canvas');
+    if (canvas != null) {
+      const W = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('width'));
+      const H = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('height'));
+      const w = parseFloat(canvas.getAttribute('width'));
+      const h = parseFloat(canvas.getAttribute('height'));
 
-    me.Crsr.x = parseInt(w/2, 10);
-    me.Crsr.y = parseInt(h/2, 10);
+      me.Crsr.x = parseInt(w / 2, 10);
+      me.Crsr.y = parseInt(h / 2, 10);
 
-    me.Crsr.fx = parseInt(w/2, 10)*(W/w);
-    me.Crsr.fy = parseInt(h/2, 10)*(H/h);
-    $('#cursor').css({ left:(me.Crsr.x*(W/w)) + 'px', top:(me.Crsr.y*(H/h)) + 'px', width:me.User.penSize*(W/w), height:me.User.penSize*(H/h) });
+      me.Crsr.fx = parseInt(w / 2, 10) * (W / w);
+      me.Crsr.fy = parseInt(h / 2, 10) * (H / h);
 
-    if(me.flagUsePreciseCursor) {
-      let finger = document.getElementById('finger');
-      if(!finger) {
-        finger = document.createElement('div');
-        finger.id = 'finger';
-        finger.className = 'touchDevice';
-        me.container.appendChild(finger);
+      let cursorElement = document.querySelector('#cursor')
+      if (cursorElement != null) {
+        cursorElement.style.top = me.Crsr.y * (H / h) + 'px'
+        cursorElement.style.left = me.Crsr.x * (W / w) + 'px'
+        cursorElement.style.width = me.User.penSize * (W / w)
+        cursorElement.style.height = me.User.penSize * (H / h)
+      }
+
+      if (me.flagUsePreciseCursor) {
+        let finger = document.getElementById('finger');
+        if (!finger) {
+          finger = document.createElement('div');
+          finger.id = 'finger';
+          finger.className = 'touchDevice';
+          me.container.appendChild(finger);
+
+          // configure touch events for tablets
+          finger.ontouchstart = me.touchstart;
+          finger.ontouchend = me.touchend;
+          finger.ontouchmove = me.touchmove;
+
+          // turn off eventual touch events handled by canvas
+          me.canvas.ontouchstart = null;
+          me.canvas.ontouchmove = null;
+          me.canvas.ontouchend = null;
+        }
+        me.updateCursor();
+
+        finger.style.left = me.Crsr.fx + 'px';
+        finger.style.top = me.Crsr.fy + 'px';
+      } else {
+        // remove precise cursor
+        const finger = document.getElementById('finger');
+        if (finger) {
+          finger.parentNode.removeChild(finger);
+        }
 
         // configure touch events for tablets
-        finger.ontouchstart = me.touchstart;
-        finger.ontouchend = me.touchend;
-        finger.ontouchmove = me.touchmove;
-
-        // turn off eventual touch events handled by canvas
-        me.canvas.ontouchstart = null;
-        me.canvas.ontouchmove = null;
-        me.canvas.ontouchend = null;
+        me.canvas.ontouchstart = me.touchstart;
+        me.canvas.ontouchmove = me.touchmove;
+        me.canvas.ontouchend = me.touchend;
       }
-      me.updateCursor();
-
-      finger.style.left = me.Crsr.fx + 'px';
-      finger.style.top = me.Crsr.fy + 'px';
-    } else {
-      // remove precise cursor
-      const finger = document.getElementById('finger');
-      if (finger) {
-        finger.parentNode.removeChild(finger);
-      }
-
-      // configure touch events for tablets
-      me.canvas.ontouchstart = me.touchstart;
-      me.canvas.ontouchmove = me.touchmove;
-      me.canvas.ontouchend = me.touchend;
     }
   },
 
@@ -323,13 +264,13 @@ export const AtlasMakerInteraction = {
     if (finger) {
       ['move', 'draw', 'configure'].forEach((className) => finger.classList.remove(className));
     }
-    switch(me.Crsr.state) {
-    case 'move': finger.classList.add('move'); break;
-    case 'draw': finger.classList.add('draw'); break;
-    case 'configure': finger.classList.add('configure'); break;
+    switch (me.Crsr.state) {
+      case 'move': finger.classList.add('move'); break;
+      case 'draw': finger.classList.add('draw'); break;
+      case 'configure': finger.classList.add('configure'); break;
     }
   },
-  _eventCoords2ImageCoords: function(ex, ey) {
+  _eventCoords2ImageCoords: function (ex, ey) {
     const canvas = document.querySelector('#atlasmaker canvas');
     const W = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('width'));
     const H = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('height'));
@@ -340,12 +281,12 @@ export const AtlasMakerInteraction = {
       left: rect.left + (document.documentElement.scrollLeft || document.body.scrollLeft),
       top: rect.top + (document.documentElement.scrollTop || document.body.scrollTop)
     };
-    const wratio = w/W;
-    const hratio = h/H;
-    const x = parseInt((ex-o.left)*wratio, 10);
-    const y = parseInt((ey-o.top)*hratio, 10);
+    const wratio = w / W;
+    const hratio = h / H;
+    const x = parseInt((ex - offset.left) * wratio, 10);
+    const y = parseInt((ey - offset.top) * hratio, 10);
 
-    return {x, y, wratio, hratio};
+    return { x, y, wratio, hratio };
   },
 
   // ====================================
@@ -359,9 +300,9 @@ export const AtlasMakerInteraction = {
   mousedown: function (e) {
     const me = AtlasMakerWidget;
     e.preventDefault();
-    const {x, y} = me._eventCoords2ImageCoords(e.pageX, e.pageY);
+    const { x, y } = me._eventCoords2ImageCoords(e.pageX, e.pageY);
     // compensation for rectangular pixels: f(brainWdim, brainHdim)
-    me.down(x, Math.round(y*me.brainWdim/me.brainHdim));
+    me.down(x, Math.round(y * me.brainWdim / me.brainHdim));
   },
 
   /**
@@ -373,16 +314,16 @@ export const AtlasMakerInteraction = {
   mousemove: function (e) {
     const me = AtlasMakerWidget;
     e.preventDefault();
-    const {x, y, wratio, hratio} = me._eventCoords2ImageCoords(e.pageX, e.pageY);
+    const { x, y, wratio, hratio } = me._eventCoords2ImageCoords(e.pageX, e.pageY);
 
     const cursor = document.querySelector('#cursor');
-    cursor.style.left = (x/wratio) + 'px';
-    cursor.style.top = (y/hratio) + 'px';
-    cursor.style.width = me.User.penSize/wratio + 'px';
-    cursor.style.height = me.User.penSize/hratio + 'px';
+    cursor.style.left = (x / wratio) + 'px';
+    cursor.style.top = (y / hratio) + 'px';
+    cursor.style.width = me.User.penSize / wratio + 'px';
+    cursor.style.height = me.User.penSize / hratio + 'px';
 
     // compensation for rectangular pixels: f(brainWdim, brainHdim)
-    me.move(x, Math.round(y*me.brainWdim/me.brainHdim));
+    me.move(x, Math.round(y * me.brainWdim / me.brainHdim));
   },
 
   /**
@@ -393,22 +334,22 @@ export const AtlasMakerInteraction = {
   mouseup: function (e) {
     const me = AtlasMakerWidget;
     e.preventDefault();
-    const {x, y} = me._eventCoords2ImageCoords(e.pageX, e.pageY);
+    const { x, y } = me._eventCoords2ImageCoords(e.pageX, e.pageY);
     // compensation for rectangular pixels: f(brainWdim, brainHdim)
-    me.up(x, Math.round(y*me.brainWdim/me.brainHdim));
+    me.up(x, Math.round(y * me.brainWdim / me.brainHdim));
   },
 
   longpress: function (e) {
     const me = AtlasMakerWidget;
     e.preventDefault();
-    const {tool} = me.User;
-    const {pageXOffset, pageYOffset} = window;
-    const {x, y} = me._eventCoords2ImageCoords(
+    const { tool } = me.User;
+    const { pageXOffset, pageYOffset } = window;
+    const { x, y } = me._eventCoords2ImageCoords(
       e.detail.clientX + pageXOffset,
       e.detail.clientY + pageYOffset
     );
 
-    if({}.hasOwnProperty.call(me.longPressTools, tool)) {
+    if ({}.hasOwnProperty.call(me.longPressTools, tool)) {
       me.longPressTools[tool](x, y);
     }
   },
@@ -424,16 +365,16 @@ export const AtlasMakerInteraction = {
     e.preventDefault();
 
     let touchEvent;
-    if(e.originalEvent) {
+    if (e.originalEvent) {
       [touchEvent] = Array.from(e.originalEvent);
     } else {
       [touchEvent] = Array.from(e.changedTouches);
     }
-    // var x = parseInt((touchEvent.pageX-o.left)*(w/W));
-    // var y = parseInt((touchEvent.pageY-o.top)*(h/H));
-    const {x, y} = me._eventCoords2ImageCoords(touchEvent.pageX, touchEvent.pageY);
+    // var x = parseInt((touchEvent.pageX-offset.left)*(w/W));
+    // var y = parseInt((touchEvent.pageY-offset.top)*(h/H));
+    const { x, y } = me._eventCoords2ImageCoords(touchEvent.pageX, touchEvent.pageY);
 
-    if(me.flagUsePreciseCursor) {
+    if (me.flagUsePreciseCursor) {
       // Precision cursor
       me.Crsr.x0 = x;
       me.Crsr.cachedX = x;
@@ -447,14 +388,14 @@ export const AtlasMakerInteraction = {
       me.Crsr.fx = rect.left + scrollLeft;
       me.Crsr.fy = rect.top + scrollTop;
       me.Crsr.touchStarted = true;
-      setTimeout(function() {
-        if( me.Crsr.cachedX === me.Crsr.x0 && me.Crsr.cachedY === me.Crsr.y0 && !me.Crsr.touchStarted) {
+      setTimeout(function () {
+        if (me.Crsr.cachedX === me.Crsr.x0 && me.Crsr.cachedY === me.Crsr.y0 && !me.Crsr.touchStarted) {
           // short tap: change mode
-          me.Crsr.state = (me.Crsr.state === 'move')?'draw':'move';
+          me.Crsr.state = (me.Crsr.state === 'move') ? 'draw' : 'move';
           me.updateCursor();
         }
       }, 200);
-      setTimeout(function() {
+      setTimeout(function () {
         if (me.Crsr.cachedX === me.Crsr.x0 && me.Crsr.cachedY === me.Crsr.y0 && me.Crsr.touchStarted) {
           // long tap: change to configure mode
           me.Crsr.prevState = me.Crsr.state;
@@ -462,8 +403,8 @@ export const AtlasMakerInteraction = {
           me.updateCursor();
         }
       }, 1000);
-      me.down(me.Crsr.x, Math.round(me.Crsr.y*me.brainWdim/me.brainHdim));
-    } else { me.down(x, Math.round(y*me.brainWdim/me.brainHdim)); }
+      me.down(me.Crsr.x, Math.round(me.Crsr.y * me.brainWdim / me.brainHdim));
+    } else { me.down(x, Math.round(y * me.brainWdim / me.brainHdim)); }
   },
 
   /**
@@ -474,40 +415,40 @@ export const AtlasMakerInteraction = {
   // eslint-disable-next-line max-statements
   touchmove: function (e) {
     const me = AtlasMakerWidget;
-    if(me.Crsr.touchStarted === false && me.debug) {
+    if (me.Crsr.touchStarted === false && me.debug) {
       console.log('WARNING: touch can move without having started');
     }
     e.preventDefault();
 
     let touchEvent;
-    if(e.originalEvent) {
+    if (e.originalEvent) {
       [touchEvent] = Array.from(e.originalEvent.changedTouches);
     } else {
       [touchEvent] = Array.from(e.changedTouches);
     }
     // var x = parseInt((touchEvent.pageX-o.left)*(w/W));
     // var y = parseInt((touchEvent.pageY-o.top)*(h/H));
-    const {x, y, wratio, hratio} = me._eventCoords2ImageCoords(touchEvent.pageX, touchEvent.pageY);
+    const { x, y, wratio, hratio } = me._eventCoords2ImageCoords(touchEvent.pageX, touchEvent.pageY);
 
-    if(me.flagUsePreciseCursor) {
+    if (me.flagUsePreciseCursor) {
       // Precision cursor
-      const dx = x-me.Crsr.x0;
-      const dy = y-me.Crsr.y0;
-      if(me.Crsr.state === 'move'||me.Crsr.state === 'draw') {
+      const dx = x - me.Crsr.x0;
+      const dy = y - me.Crsr.y0;
+      if (me.Crsr.state === 'move' || me.Crsr.state === 'draw') {
         me.Crsr.x += dx;
         me.Crsr.y += dy;
 
         const cursor = document.querySelector('#cursor');
-        cursor.style.left = me.Crsr.x/wratio + 'px';
-        cursor.style.top = me.Crsr.y/hratio + 'px';
-        cursor.style.width = me.User.penSize/wratio + 'px';
-        cursor.style.height = me.User.penSize/hratio + 'px';
+        cursor.style.left = me.Crsr.x / wratio + 'px';
+        cursor.style.top = me.Crsr.y / hratio + 'px';
+        cursor.style.width = me.User.penSize / wratio + 'px';
+        cursor.style.height = me.User.penSize / hratio + 'px';
 
-        if(me.Crsr.state === 'draw') { me.move(me.Crsr.x, Math.round(me.Crsr.y*me.brainWdim/me.brainHdim)); }
+        if (me.Crsr.state === 'draw') { me.move(me.Crsr.x, Math.round(me.Crsr.y * me.brainWdim / me.brainHdim)); }
       }
 
-      me.Crsr.fx += dx/wratio;
-      me.Crsr.fy += dy/hratio;
+      me.Crsr.fx += dx / wratio;
+      me.Crsr.fy += dy / hratio;
       const finger = document.querySelector('#finger');
       const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
       const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
@@ -522,11 +463,11 @@ export const AtlasMakerInteraction = {
     } else {
 
       const cursor = document.querySelector('#cursor');
-      cursor.style.left = (x/wratio) + 'px';
-      cursor.style.top = (y/hratio) + 'px';
-      cursor.style.width = me.User.penSize/wratio + 'px';
-      cursor.style.height = me.User.penSize/hratio + 'px';
-      me.move(x, Math.round(y*me.brainWdim/me.brainHdim));
+      cursor.style.left = (x / wratio) + 'px';
+      cursor.style.top = (y / hratio) + 'px';
+      cursor.style.width = me.User.penSize / wratio + 'px';
+      cursor.style.height = me.User.penSize / hratio + 'px';
+      me.move(x, Math.round(y * me.brainWdim / me.brainHdim));
     }
   },
 
@@ -539,17 +480,17 @@ export const AtlasMakerInteraction = {
     const me = AtlasMakerWidget;
     e.preventDefault();
     let touchEvent;
-    if(e.originalEvent) {
+    if (e.originalEvent) {
       [touchEvent] = Array.from(e.originalEvent);
     } else {
       [touchEvent] = Array.from(e.changedTouches);
     }
-    const {x, y} = me._eventCoords2ImageCoords(touchEvent.pageX, touchEvent.pageY);
+    const { x, y } = me._eventCoords2ImageCoords(touchEvent.pageX, touchEvent.pageY);
 
-    if(me.flagUsePreciseCursor) {
+    if (me.flagUsePreciseCursor) {
       // Precision cursor
       me.Crsr.touchStarted = false;
-      if(me.Crsr.state === 'configure') {
+      if (me.Crsr.state === 'configure') {
         me.Crsr.state = me.Crsr.prevState;
         me.updateCursor();
       }
@@ -566,8 +507,8 @@ export const AtlasMakerInteraction = {
    */
   down: function (x, y) {
     const me = AtlasMakerWidget;
-    const {tool} = me.User;
-    if({}.hasOwnProperty.call(me.clickDownTools, tool)) {
+    const { tool } = me.User;
+    if ({}.hasOwnProperty.call(me.clickDownTools, tool)) {
       me.clickDownTools[tool](x, y);
     }
 
@@ -584,9 +525,9 @@ export const AtlasMakerInteraction = {
    */
   move: function (x, y) {
     const me = AtlasMakerWidget;
-    if(!me.User.mouseIsDown) { return; }
-    const {tool} = me.User;
-    if({}.hasOwnProperty.call(me.moveTools, tool)) {
+    if (!me.User.mouseIsDown) { return; }
+    const { tool } = me.User;
+    if ({}.hasOwnProperty.call(me.moveTools, tool)) {
       me.moveTools[tool](x, y);
     }
   },
@@ -601,8 +542,8 @@ export const AtlasMakerInteraction = {
   up: function (x, y) {
     const me = AtlasMakerWidget;
 
-    const {tool} = me.User;
-    if({}.hasOwnProperty.call(me.clickUpTools, tool)) {
+    const { tool } = me.User;
+    if ({}.hasOwnProperty.call(me.clickUpTools, tool)) {
       me.clickUpTools[tool](x, y);
     }
 
@@ -627,28 +568,28 @@ export const AtlasMakerInteraction = {
     const me = AtlasMakerWidget;
     // console.log("key:", e.which);
 
-    if(e.which === 13 && e.target.getAttribute('contenteditable')) {
+    if (e.which === 13 && e.target.getAttribute('contenteditable')) {
       e.preventDefault();
 
       return;
     }
 
-    if(e.target.tagName !== 'BODY') { return; }
+    if (e.target.tagName !== 'BODY') { return; }
 
-    switch(e.which) {
-    case 13: // return
-      if(me.User.measureLength) {
-        let length = 0;
-        const p = me.User.measureLength;
-        const wdim = me.brainWdim;
-        const hdim = me.brainHdim;
-        let i;
-        for(i = 1; i<p.length; i++) { length += Math.sqrt((wdim*(p[i].x-p[i-1].x))**2 + (hdim*(p[i].y-p[i-1].y))**2); }
-        me.appendChatMessage('Length: ' + length);
-        me.User.measureLength = null;
-        me.displayInformation();
-      }
-      break;
+    switch (e.which) {
+      case 13: // return
+        if (me.User.measureLength) {
+          let length = 0;
+          const p = me.User.measureLength;
+          const wdim = me.brainWdim;
+          const hdim = me.brainHdim;
+          let i;
+          for (i = 1; i < p.length; i++) { length += Math.sqrt((wdim * (p[i].x - p[i - 1].x)) ** 2 + (hdim * (p[i].y - p[i - 1].y)) ** 2); }
+          me.appendChatMessage('Length: ' + length);
+          me.User.measureLength = null;
+          me.displayInformation();
+        }
+        break;
     }
   },
 
@@ -716,28 +657,27 @@ export const AtlasMakerInteraction = {
      */
   upload: function () {
     const me = AtlasMakerWidget;
-    const inp = $('<input>');
-    inp.hide();
-    $('body').append(inp);
-    const input = inp.get(0);
+    const input = document.createElement('input');
+    input.style.display = "none";
+    document.body.appendChild(input);
     input.type = 'file';
     input.onchange = function () {
       const [name] = this.files;
       const reader = new FileReader();
       // eslint-disable-next-line max-statements
       reader.onload = function (e) {
-        const {result} = e.target;
+        const { result } = e.target;
         let nii;
-        if(name.name.split('.').pop() === 'gz') {
+        if (name.name.split('.').pop() === 'gz') {
           const inflate = new pako.Inflate();
           inflate.push(new Uint8Array(result), true);
           nii = inflate.result.buffer;
         } else { nii = result; }
         const mri = me.loadNifti(nii);
 
-        if( mri.dim[0] !== me.User.dim[0] ||
-                    mri.dim[1] !== me.User.dim[1] ||
-                    mri.dim[2] !== me.User.dim[2]) {
+        if (mri.dim[0] !== me.User.dim[0] ||
+          mri.dim[1] !== me.User.dim[1] ||
+          mri.dim[2] !== me.User.dim[2]) {
           console.log('ERROR: Volume dimensions do not match');
 
           return;
@@ -745,7 +685,7 @@ export const AtlasMakerInteraction = {
 
         // copy uploaded data to atlas data
         let i;
-        for(i = 0; i<me.atlas.data.length; i++) { me.atlas.data[i] = mri.data[i]; }
+        for (i = 0; i < me.atlas.data.length; i++) { me.atlas.data[i] = mri.data[i]; }
 
         // send uploaded data to server (compressed)
         me.sendAtlasDataMessage(mri.data);
@@ -787,7 +727,7 @@ export const AtlasMakerInteraction = {
   _showToolDown: function (x, y) {
     const me = AtlasMakerWidget;
     me.User.mouseIsDown = true;
-    me.sendUserDataMessage(JSON.stringify({ 'mouseIsDown':true }));
+    me.sendUserDataMessage(JSON.stringify({ 'mouseIsDown': true }));
     me.showxy(-1, 'm', x, y, me.User);
   },
   _showToolMove: function (x, y) {
@@ -802,17 +742,17 @@ export const AtlasMakerInteraction = {
 
   _paintToolDown: function (x, y) {
     const me = AtlasMakerWidget;
-    if(me.editMode === 0) {
+    if (me.editMode === 0) {
       // check for 'edit' access
       return;
     }
-    if(me.User.doFill) {
+    if (me.User.doFill) {
       // fill
       me.paintxy(-1, 'f', x, y, me.User);
     } else {
       //paint
       me.User.mouseIsDown = true;
-      me.sendUserDataMessage(JSON.stringify({ 'mouseIsDown':true }));
+      me.sendUserDataMessage(JSON.stringify({ 'mouseIsDown': true }));
       me.paintxy(-1, 'mf', x, y, me.User);
     }
   },
@@ -827,11 +767,11 @@ export const AtlasMakerInteraction = {
 
     // add annotated length to User.annotation length and post to DB
     me.logToDatabase('annotationLength', {
-      source:me.User.source,
-      atlas:me.User.atlasFilename,
-      length:me.annotationLength
+      source: me.User.source,
+      atlas: me.User.atlasFilename,
+      length: me.annotationLength
     })
-      .then(function(response) {
+      .then(function (response) {
         const length = parseInt(response.length, 10);
         me.info.length = length + ' mm';
         me.displayInformation();
@@ -847,17 +787,17 @@ export const AtlasMakerInteraction = {
 
   _eraseToolDown: function (x, y) {
     const me = AtlasMakerWidget;
-    if(me.editMode === 0) {
+    if (me.editMode === 0) {
       // check for 'edit' access
       return;
     }
-    if(me.User.doFill) {
+    if (me.User.doFill) {
       // fill
       me.paintxy(-1, 'e', x, y, me.User);
     } else {
       // erase
       me.User.mouseIsDown = true;
-      me.sendUserDataMessage(JSON.stringify({ 'mouseIsDown':true }));
+      me.sendUserDataMessage(JSON.stringify({ 'mouseIsDown': true }));
       me.paintxy(-1, 'me', x, y, me.User);
     }
   },
@@ -875,25 +815,25 @@ export const AtlasMakerInteraction = {
    */
   _eyedropToolDown: function (x, y) {
     const me = AtlasMakerWidget;
-    const value = me.eyedrop( x, y, me.User );
+    const value = me.eyedrop(x, y, me.User);
     if (value) {
       const index = me.ontology.valueToIndex[value];
       const selRegionName = me.ontology.labels[index].name;
       me.info.region = selRegionName;
-      me.changePenColor( index );
+      me.changePenColor(index);
     }
   },
   _eyedropToolUp: function () {
     const me = AtlasMakerWidget;
     me.displayInformation();
 
-    const msg = { 'c':'mu' };
+    const msg = { 'c': 'mu' };
     me.sendPaintMessage(msg);
   },
-  eyedrop : function ( x, y, usr) {
+  eyedrop: function (x, y, usr) {
     const me = AtlasMakerWidget;
     const z = usr.slice;
-    const i = me.slice2index( x, y, z, usr.view );
+    const i = me.slice2index(x, y, z, usr.view);
 
     return me.atlas.data[i];
   },
@@ -902,13 +842,13 @@ export const AtlasMakerInteraction = {
   _landmarkToolDown: function (x, y) {
     const me = AtlasMakerWidget;
     me.User.mouseIsDown = true;
-    for(let i=0; i<me.User.vectorial.length; i++) {
+    for (let i = 0; i < me.User.vectorial.length; i++) {
       const ann = me.User.vectorial[i];
-      if(ann.type !== 'text') {
+      if (ann.type !== 'text') {
         continue;
       }
       const [sx, sy, sz] = me._voxelCoord2ScreenCoord(ann.position);
-      if (me.User.slice === sz && (x-sx)**2 + (y-sy)**2 < 2**2) {
+      if (me.User.slice === sz && (x - sx) ** 2 + (y - sy) ** 2 < 2 ** 2) {
         me.User.x0 = x;
         me.User.y0 = y;
         me.User.indexOfMovingLandmark = i;
@@ -920,7 +860,7 @@ export const AtlasMakerInteraction = {
   _landmarkToolMove: function (x, y) {
     const me = AtlasMakerWidget;
     const index = me.User.indexOfMovingLandmark;
-    if(typeof index === 'undefined') {
+    if (typeof index === 'undefined') {
       return;
     }
     const position = me.slice2xyzi(x, y, me.User.slice, me.User.view);
@@ -936,15 +876,15 @@ export const AtlasMakerInteraction = {
     const me = AtlasMakerWidget;
     const type = 'text';
     const position = me.slice2xyzi(x, y, me.User.slice, me.User.view);
-    if(typeof me.User.vectorial === 'undefined') {
+    if (typeof me.User.vectorial === 'undefined') {
       me.User.vectorial = [];
     }
-    if(me.User.mouseIsDown && typeof me.User.indexOfMovingLandmark === 'undefined') {
+    if (me.User.mouseIsDown && typeof me.User.indexOfMovingLandmark === 'undefined') {
       const text = prompt('Landmark label');
-      if(text === null) {
+      if (text === null) {
         return;
       }
-      me.User.vectorial.push({type, position, text});
+      me.User.vectorial.push({ type, position, text });
       me.sendVectorialAnnotationMessage(me.User.vectorial);
       me.displayInformation();
     }
@@ -952,7 +892,7 @@ export const AtlasMakerInteraction = {
   },
   landmarkClick: function () {
     const me = AtlasMakerWidget;
-    if(typeof me.User.vectorial === 'undefined') {
+    if (typeof me.User.vectorial === 'undefined') {
       me.User.vectorial = [];
     }
     const vectorial = JSON.parse(JSON.stringify(me.User.vectorial));
@@ -960,10 +900,10 @@ export const AtlasMakerInteraction = {
 
     const displayTable = () => {
       const html = [];
-      for(let i=0; i<vectorial.length; i++) {
+      for (let i = 0; i < vectorial.length; i++) {
         const ann = vectorial[i];
-        if(ann.type !== 'text') { continue; }
-        const worldCoords = me.mulMatVec(me.User.v2w, ann.position).map((v) => parseInt(v*10, 10)/10.0);
+        if (ann.type !== 'text') { continue; }
+        const worldCoords = me.mulMatVec(me.User.v2w, ann.position).map((v) => parseInt(v * 10, 10) / 10.0);
         html.push(`
           <tr data-row=${i}>
             <td contentEditable class="noEmptyWithPlaceholder" placeholder="Enter landmark label"
@@ -979,7 +919,7 @@ export const AtlasMakerInteraction = {
       dialog.style.display = 'inline-block';
     };
     const exit = () => {
-      for(const l of listeners) {
+      for (const l of listeners) {
         dialog.querySelector(l.sel).removeEventListener('click', l.func);
         dialog.style.display = 'none';
       }
@@ -1002,12 +942,12 @@ export const AtlasMakerInteraction = {
           const csv = [
             'Label, i, j, k, x, y, z',
             ...vectorial.filter((ann) => ann.type === 'text').map((ann) => {
-              const worldCoords = me.mulMatVec(me.User.v2w, ann.position).map((v) => parseInt(v*10, 10)/10.0);
+              const worldCoords = me.mulMatVec(me.User.v2w, ann.position).map((v) => parseInt(v * 10, 10) / 10.0);
 
               return `${ann.text}, ${ann.position.slice(0, 3)}, ${worldCoords}`;
             })
           ].join('\n');
-          const csvData = 'data:text/ascii;charset=utf-8,'+encodeURIComponent(csv);
+          const csvData = 'data:text/ascii;charset=utf-8,' + encodeURIComponent(csv);
           const a = document.createElement('a');
           a.href = csvData;
           a.download = 'landmarks.csv';
@@ -1029,35 +969,35 @@ export const AtlasMakerInteraction = {
         ev: 'click',
         func: (ev) => {
           const tr = ev.target.closest('tr');
-          for(const row of tr.closest('tbody').rows) {
+          for (const row of tr.closest('tbody').rows) {
             row.classList.remove('selected');
           }
           tr.classList.add('selected');
         }
       }
     ];
-    for(const l of listeners) {
+    for (const l of listeners) {
       dialog.querySelector(l.sel).addEventListener('click', l.func);
     }
     displayTable();
   },
   landmarkToolDisplayInformation: function (svgStr) {
     const me = AtlasMakerWidget;
-    const {slice} = me.User;
+    const { slice } = me.User;
     const canvas = document.querySelector('#atlasmaker canvas');
     const W = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('width'));
     const w = parseFloat(canvas.getAttribute('width'));
-    const zx = W/w;
-    const zy = zx*me.brainHdim/me.brainWdim;
-    if(typeof me.User.vectorial !== 'undefined') {
-      for(const a of me.User.vectorial.filter((o) => o.type === 'text')) {
-        const {text, position} = a;
+    const zx = W / w;
+    const zy = zx * me.brainHdim / me.brainWdim;
+    if (typeof me.User.vectorial !== 'undefined') {
+      for (const a of me.User.vectorial.filter((o) => o.type === 'text')) {
+        const { text, position } = a;
         const [x, y, z] = me._voxelCoord2ScreenCoord(position);
         const onSlice = (z === slice);
-        if(onSlice) {
+        if (onSlice) {
           svgStr +=
-`
-<g transform='translate(${zx*x},${zy*y}) scale(0.85)'>
+            `
+<g transform='translate(${zx * x},${zy * y}) scale(0.85)'>
 <path class='landmark' fill='#ffffff' stroke='#00000080' d="m 0,0 c 0,0 6,-6 9,-11 3,-5 0,-15 -9,-15 -9,0 -12,10 -9,15 3,5 9,11 9,11 z"></path>
 <text fill='white' x=10 y='-10'>${text}</text>
 </g>
@@ -1073,51 +1013,51 @@ export const AtlasMakerInteraction = {
   // Measure tool
   _measureToolDownHandler: function (x, y) {
     const me = AtlasMakerWidget;
-    if(me.User.measureLength === null) {
-      me.User.measureLength = [{ x:x, y:y }];
+    if (me.User.measureLength === null) {
+      me.User.measureLength = [{ x: x, y: y }];
     } else {
-      me.User.measureLength.push({ x:x, y:y });
+      me.User.measureLength.push({ x: x, y: y });
     }
     me.displayInformation();
   },
   measureToolDisplayInformation: function (svgStr) {
     const me = AtlasMakerWidget;
-    if(me.User.measureLength) {
+    if (me.User.measureLength) {
       const canvas = document.querySelector('#atlasmaker canvas');
       const W = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('width'));
       const w = parseFloat(canvas.getAttribute('width'));
-      const zx = W/w;
-      const zy = zx*me.brainHdim/me.brainWdim;
+      const zx = W / w;
+      const zy = zx * me.brainHdim / me.brainWdim;
       const p = me.User.measureLength;
-      let str1 = 'M' + zx*p[0].x + ', ' + zy*p[0].y;
+      let str1 = 'M' + zx * p[0].x + ', ' + zy * p[0].y;
       let i;
-      for(i = 1; i<p.length; i++) {
-        str1 += 'L' + zx*p[i].x + ', ' + zy*p[i].y;
+      for (i = 1; i < p.length; i++) {
+        str1 += 'L' + zx * p[i].x + ', ' + zy * p[i].y;
       }
       svgStr += [
-        '<circle fill=\'#00ff00\' cx=' + zx*p[0].x + ' cy=' + zy*p[0].y + ' r=3 />',
+        '<circle fill=\'#00ff00\' cx=' + zx * p[0].x + ' cy=' + zy * p[0].y + ' r=3 />',
         '<path stroke=\'#00ff00\' fill=\'none\' d=\'' + str1 + '\'/>',
-        (i>0)?'<circle fill=\'#00ff00\' cx=' + zx*p[i-1].x + ' cy=' + zy*p[i-1].y + ' r=3 />':''
+        (i > 0) ? '<circle fill=\'#00ff00\' cx=' + zx * p[i - 1].x + ' cy=' + zy * p[i - 1].y + ' r=3 />' : ''
       ].join('\n');
     }
 
     return svgStr;
   },
 
-  appendChatMessage: function(msg) {
+  appendChatMessage: function (msg) {
     const me = AtlasMakerWidget;
     me.receivedMessages.push(msg);
-    window.dispatchEvent(new CustomEvent('newMessage', { detail: { message: msg }}));
+    window.dispatchEvent(new CustomEvent('newMessage', { detail: { message: msg } }));
   },
 
-  setNotification: function(msg) {
+  setNotification: function (msg) {
     const me = AtlasMakerWidget;
     me.notificationMessage = msg;
-    window.dispatchEvent(new CustomEvent('newNotification', { detail: { notification: msg }}));
+    window.dispatchEvent(new CustomEvent('newNotification', { detail: { notification: msg } }));
   },
 
   setLoadingMessage(msg) {
-    window.dispatchEvent(new CustomEvent('newLoadingMessage', { detail: { message: msg }}));
+    window.dispatchEvent(new CustomEvent('newLoadingMessage', { detail: { message: msg } }));
   },
 
   sendFinishedLoadingEvent() {

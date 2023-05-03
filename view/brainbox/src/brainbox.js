@@ -56,7 +56,7 @@ export const BrainBox = {
       const index = param.annotationItemIndex || 0;
 
       // Copy MRI from source
-      $('#msgLog').html('<p>Downloading from source to server...');
+      AtlasMakerWidget.appendChatMessage('<p>Downloading from source to server...');
 
       // Configure MRI into atlasmaker
       if (param.info.success === false) {

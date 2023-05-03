@@ -531,12 +531,12 @@ const me = {
     let info2;
     let res;
     let labels;
-
     // configure MRI and ontology
     try {
-      info2 = await me._configureMRI(info, index);
+      info2 = await me._configureMRI(info, index-1); // NB: Cheated and took index minus 1 to start with 0
       info = info2;
-      res = await fetch(me.hostname + '/labels/' + info.mri.atlas[index].labels);
+      const url = me.hostname + '/labels/' + info.mri.atlas[index-1].labels; // NB: Cheated and took index minus 1 to start with 0
+      res = await fetch(url);
       labels = await res.json();
     } catch (err) {
       throw new Error(err);
